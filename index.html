@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en" class="dark-mode">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Training">
+  
+  <title>Training Plan</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    
+    :root {
+      /* Dark Mode Base */
+      --bg: #000000;
+      --bg-gradient: radial-gradient(circle at 50% 0%, rgba(0, 158, 119, 0.05), transparent 60%), #050505;
+      --surface: rgba(255, 255, 255, 0.02);
+      --surface-glass: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --text: #ffffff;
+      --muted: #888888;
+      --muted2: #555555;
+      --modal-bg: rgba(15, 15, 15, 0.95);
+      
+      /* Shared Accents */
+      --accent: #009E77; /* Vibrant Teal */
+      --good: #009E77;
+      --bad: #ff453a;
+      --radius: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 40px 80px rgba(0,0,0,0.8);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --blur: blur(24px);
+    }
+
+    /* Light Mode Overrides */
+    html.light-mode {
+      --bg: #f5f5f7;
+      --bg-gradient: radial-gradient(circle at 50% 0%, rgba(0, 158, 119, 0.08), transparent 60%), #f5f5f7;
+      --surface: rgba(0, 0, 0, 0.03);
+      --surface-glass: rgba(255, 255, 255, 0.6);
+      --border: rgba(0, 0, 0, 0.06);
+      --border-hover: rgba(0, 0, 0, 0.12);
+      --text: #1d1d1f;
+      --muted: #86868b;
+      --muted2: #a1a1a6;
+      --modal-bg: rgba(245, 245, 247, 0.95);
+      --shadow: 0 30px 60px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    html, body { height: 100%; overscroll-behavior-y: none; transition: background 0.4s ease, color 0.4s ease; }
+    
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.01em;
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    h1, h2, h3, b { font-weight: 500; letter-spacing: -0.03em; }
+    
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 20px calc(80px + env(safe-area-inset-bottom)); }
+    
+    header { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; margin-bottom: 32px; }
+    .hleft { display: flex; flex-direction: column; gap: 8px; }
+    h1 { margin: 0; font-size: 28px; color: var(--text); }
+    .sub { color: var(--muted); font-size: 14px; line-height: 1.5; max-width: 60ch; font-weight: 300; }
+    
+    .header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: flex-end; }
+    
+    .theme-toggle {
+      background: transparent; border: none; padding: 8px; cursor: pointer;
+      color: var(--muted); border-radius: 50%; transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .theme-toggle:hover { color: var(--text); background: var(--surface); }
+    .theme-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    html.light-mode .icon-sun { display: none; }
+    html.light-mode .icon-moon { display: block; }
+    html.dark-mode .icon-sun { display: block; }
+    html.dark-mode .icon-moon { display: none; }
+
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid var(--border); background: var(--surface);
+      padding: 8px 14px; border-radius: 999px; color: var(--muted); font-size: 12px; font-weight: 400;
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    }
+    .chip b { color: var(--text); font-weight: 500; }
+
+    .grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+    @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface-glass);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    
+    .card .hd {
+      padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+    .hd .ttl { display: flex; flex-direction: column; gap: 4px; }
+    .hd .ttl .t { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .hd .ttl .k { font-size: 13px; color: var(--muted2); font-weight: 300; }
+    
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; background: var(--surface); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .tab {
+      cursor: pointer; padding: 10px 16px; border-radius: var(--radius-sm);
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      user-select: none; transition: all 0.3s ease; touch-action: manipulation;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--bg); background: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    html.light-mode .tab.active { color: #fff; background: var(--text); }
+    
+    .body { padding: 24px; }
+    @media (max-width: 768px) { .body { padding: 16px; } .card .hd { padding: 16px; } }
+
+    .wk { display: none; animation: fadeIn 0.4s ease forwards; }
+    .wk.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .days { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 820px) { .days { grid-template-columns: 1fr; } }
+    
+    .day {
+      border: 1px solid var(--border); background: var(--surface);
+      border-radius: var(--radius-md); overflow: hidden; transition: border-color 0.3s ease;
+    }
+    .day:hover { border-color: var(--border-hover); }
+    
+    .day .top {
+      padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01);
+    }
+    .day .name { display: flex; flex-direction: column; gap: 6px; }
+    .day .name b { font-size: 16px; color: var(--text); }
+    .day .name span { font-size: 13px; color: var(--muted); font-weight: 300; }
+    .day .right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    
+    .pill { font-family: var(--mono); font-size: 11px; letter-spacing: -0.02em; border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; color: var(--muted); background: var(--surface); white-space: nowrap; }
+    
+    .list { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+    
+    .ex {
+      display: grid; grid-template-columns: 48px 1fr auto auto; gap: 14px;
+      align-items: center; padding: 12px; border-radius: var(--radius-sm); border: 1px solid transparent; transition: background 0.2s ease;
+    }
+    .ex:hover { background: var(--surface); border-color: var(--border); }
+    @media (max-width: 600px) { .ex { grid-template-columns: 48px 1fr auto; gap: 10px; } .ex .sr { display: none; } }
+
+    .ex-thumb { width: 48px; height: 48px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); object-fit: cover; display: block; }
+    .ex-thumb-empty {
+      width: 48px; height: 48px; border-radius: 8px; background: var(--surface); border: 1px dashed var(--border);
+      display: flex; align-items: center; justify-content: center; color: var(--muted2); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    
+    .ex .nm { display: flex; flex-direction: column; gap: 4px; line-height: 1.3; }
+    .ex .nm .t { font-weight: 500; font-size: 14px; }
+    .ex .nm .d { font-size: 12px; color: var(--muted); font-weight: 300; }
+    .ex .sr { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
+
+    /* Updated Interactive Button Classes */
+    .btn {
+      border: 1px solid var(--border); 
+      background: var(--surface); 
+      color: var(--text);
+      padding: 10px 16px; 
+      border-radius: var(--radius-sm); 
+      cursor: pointer; 
+      font-size: 13px; 
+      font-weight: 500; 
+      font-family: var(--sans);
+      user-select: none; 
+      touch-action: manipulation; 
+      min-height: 44px; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center;
+      white-space: nowrap; 
+      flex-shrink: 0; 
+      transform: scale(1);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn:hover:not(:disabled) { 
+      background: var(--border); 
+      border-color: var(--border-hover); 
+    }
+
+    .btn:active:not(:disabled) { 
+      transform: scale(0.96); 
+    }
+
+    .btn:disabled { 
+      opacity: 0.4; 
+      cursor: not-allowed; 
+    }
+    
+    .btn.primary { background: var(--text); color: var(--bg); border: none; }
+    .btn.primary:hover:not(:disabled) { opacity: 0.9; }
+    html.light-mode .btn.primary { background: var(--text); color: #fff; }
+    .btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+    
+    .inp {
+      width: 100%; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      padding: 14px; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 16px; outline: none; transition: all 0.3s ease; -webkit-appearance: none;
+    }
+    .inp:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0, 158, 119, 0.15); background: var(--surface-glass); }
+
+    .sideStack { display: flex; flex-direction: column; gap: 24px; }
+    .kpiGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kpi { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-md); padding: 16px; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
+    .kpi .k { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+    .kpi .v { font-size: 24px; font-weight: 400; letter-spacing: -0.03em; color: var(--text); font-family: var(--mono); }
+
+    .panel { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-md); padding: 24px; }
+    .panel h3 { margin: 0 0 8px 0; font-size: 14px; color: var(--text); font-weight: 500; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 980px) { .row2 { grid-template-columns: 1fr; } }
+    
+    .muted { color: var(--muted); font-weight: 300; }
+    .small { font-size: 13px; line-height: 1.5; }
+
+    .modalOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: none; align-items: flex-start; justify-content: center;
+      padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+      z-index: 50; opacity: 0; transition: opacity 0.3s ease; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    html.light-mode .modalOverlay { background: rgba(255,255,255,0.4); }
+    .modalOverlay.show { display: flex; opacity: 1; }
+    
+    .modal {
+      width: min(900px, 100%); background: var(--modal-bg);
+      border: 1px solid var(--border-hover); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden; transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1); margin: auto;
+    }
+    .modalOverlay.show .modal { transform: translateY(0); }
+    
+    .modal .mhd {
+      padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 2;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    .modal .mhd .left { display: flex; flex-direction: column; gap: 6px; }
+    .modal .mhd .left b { font-size: 18px; color: var(--text); }
+    .modal .mhd .left span { font-size: 13px; color: var(--accent); font-weight: 400; }
+    .modal .mbody { padding: 24px; }
+
+    .modal-hero-img { width: 100%; height: 280px; object-fit: contain; border-radius: var(--radius-sm); margin-bottom: 20px; border: 1px solid var(--border); background: var(--surface); display: none; }
+    
+    .setGrid { display: grid; grid-template-columns: 1fr 1fr 1fr 140px; gap: 16px; align-items: end; margin-top: 16px; }
+    @media (max-width: 720px) { .setGrid { grid-template-columns: 1fr 1fr; } }
+    
+    .label { font-size: 12px; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+    .inline { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+    .hr { height: 1px; background: var(--border); margin: 24px 0; border: none; }
+    
+    .toast {
+      position: fixed; left: 50%; bottom: calc(32px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+      background: var(--modal-bg); border: 1px solid var(--border-hover); border-radius: 999px; padding: 14px 24px;
+      color: var(--text); box-shadow: 0 20px 40px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.2, 0, 0, 1); z-index: 60; font-size: 14px; font-weight: 500;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body class="dark-mode">
+<div class="wrap">
+  <header>
+    <div class="hleft">
+      <h1>Training Plan</h1>
+      <div class="sub">A minimalist weekly structure. Log sets, track volume, and monitor progression.</div>
+    </div>
+    <div class="header-actions">
+      <div class="chips">
+        <div class="chip"><b>5 days</b> / week</div>
+        <div class="chip"><b>Hypertrophy</b> block</div>
+      </div>
+      <button class="theme-toggle" id="themeBtn" aria-label="Toggle light/dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <div class="hd">
+        <div class="ttl">
+          <div class="t">Schedule</div>
+          <div class="k">Start your day to begin tracking time.</div>
+        </div>
+        <div class="tabs" id="tabs">
+          <div class="tab active" data-tab="week">Week</div>
+          <div class="tab" data-tab="progress">Progress</div>
+          <div class="tab" data-tab="settings">Settings</div>
+        </div>
+      </div>
+
+      <div class="body">
+        <div id="week" class="wk active">
+          <div class="days" id="days"></div>
+        </div>
+
+        <div id="progress" class="wk">
+          <div class="row2">
+            <div class="panel">
+              <h3>Body Composition</h3>
+              <div class="small muted">Log your body weight to track mass and skeletal composition alongside your lifting volume.</div>
+              <div class="inline" style="flex-wrap: nowrap;">
+                <input class="inp" id="bwInput" type="number" step="0.1" inputmode="decimal" placeholder="Weight (lbs)"/>
+                <button class="btn primary" id="logBwBtn">Log Weight</button>
+              </div>
+              <hr class="hr">
+              <div id="bwHistory" class="small muted" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+            
+            <div class="panel">
+              <h3>Recent sessions</h3>
+              <div id="recent" class="small muted" style="margin-top: 16px;"></div>
+              <hr class="hr">
+              <div class="inline">
+                <button class="btn ghost" id="exportAll">Export data</button>
+                <button class="btn ghost" id="wipeAll" style="color:var(--bad)">Wipe data</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="settings" class="wk">
+          <div class="row2">
+            <div class="panel">
+              <h3>Baseline weights</h3>
+              <div class="setGrid">
+                <div><div class="label">Lat pulldown</div><input class="inp" id="b_pulldown" inputmode="numeric"/></div>
+                <div><div class="label">Seated row</div><input class="inp" id="b_row" inputmode="numeric"/></div>
+                <div><div class="label">Chest press</div><input class="inp" id="b_chest" inputmode="numeric"/></div>
+                <div><div class="label">MTS High row</div><input class="inp" id="b_highrow" inputmode="numeric"/></div>
+                <div><div class="label">Shoulder press</div><input class="inp" id="b_shpress" inputmode="numeric"/></div>
+                <div></div>
+                <button class="btn primary" id="saveBase">Save Settings</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sideStack">
+      <div class="card">
+        <div class="hd">
+          <div class="ttl">
+            <div class="t">Today</div>
+            <div class="k">Session control</div>
+          </div>
+          <span class="pill" id="todayPill">No session running</span>
+        </div>
+        <div class="body">
+          <div class="kpiGrid">
+            <div class="kpi"><div class="k">Time</div><div class="v" id="sessionTime">—</div></div>
+            <div class="kpi"><div class="k">Logged sets</div><div class="v" id="setsCount">0</div></div>
+            <div class="kpi" style="grid-column: 1 / -1;"><div class="k">Volume (est.)</div><div class="v" id="volume">0</div></div>
+          </div>
+          <div class="inline" style="margin-top: 24px; flex-wrap: nowrap;">
+            <button class="btn primary" id="finish" style="flex: 1;" disabled>Finish session</button>
+            <button class="btn ghost" id="cancel" disabled>Cancel</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="modalOverlay" id="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="mhd">
+      <div class="left">
+        <b id="m_title">Log sets</b>
+        <span id="m_sub">Enter weight and reps for each set.</span>
+      </div>
+      <button class="btn ghost" id="m_close" style="min-height: auto; padding: 8px 12px;">Close</button>
+    </div>
+    <div class="mbody">
+      <img id="m_hero" class="modal-hero-img" alt="Exercise Form"/>
+      
+      <div class="row2">
+        <div class="panel">
+          <h3>Set logger</h3>
+          <div class="setGrid" id="setGrid"></div>
+          <hr class="hr">
+          <div class="inline" style="flex-wrap: nowrap;">
+            <button class="btn primary" id="m_save" style="flex:1">Save sets</button>
+            <button class="btn ghost" id="m_rest">Start rest timer</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Target</h3>
+          <div id="m_suggest" class="small muted" style="margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: rgba(0,158,119,0.05); border: 1px solid rgba(0,158,119,0.2); color: var(--text);"></div>
+          <hr class="hr">
+          <h3>History</h3>
+          <div id="m_hist" class="small muted" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "training_plan_app_v4";
+const defaultBaseline = { pulldown:70, row:120, chest:140, highrow:80, shpress:60 };
+const defaultSettings = { restSec:75, plankSec:60 };
+
+const days = [
+  {
+    id:"D1", title:"Day 1 — Frame A", subtitle:"Back + shoulders, plus a short leg block",
+    pills:["Walk 10m"],
+    items:[
+      {key:"pulldown", name:"Lat pulldown (neutral)", detail:"Elbows down. No shrug.", sets:3, reps:"8–12", img:"img/lat-pulldown.jpg"},
+      {key:"row", name:"Seated row", detail:"Pull to lower ribs. No rocking.", sets:3, reps:"8–12", img:"img/seated-row.jpg"},
+      {key:"sideraise", name:"Side raises", detail:"Width. Light + strict.", sets:4, reps:"12–20", img:"img/side-raise.jpg"},
+      {key:"reardelt", name:"Rear delts", detail:"Posture + shoulder shape.", sets:3, reps:"12–15"}
+    ]
+  },
+  {
+    id:"D2", title:"Day 2 — Push", subtitle:"Upper chest + shoulders + triceps",
+    pills:["Walk 10m"],
+    items:[
+      {key:"chest", name:"Chest press machine", detail:"Stop if shoulder pinches.", sets:3, reps:"8–12", img:"img/chest-press.jpg"},
+      {key:"shpress", name:"Shoulder press", detail:"No shrug.", sets:3, reps:"8–12", img:"img/shoulder-press.jpg"},
+      {key:"sideraise2", name:"Side raises", detail:"Light + controlled.", sets:3, reps:"12–20"},
+      {key:"triceps", name:"Triceps pushdown", detail:"Elbows quiet.", sets:3, reps:"10–15"}
+    ]
+  }
+];
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { baseline: {...defaultBaseline}, settings:{...defaultSettings}, sessions:[], bodyweight:[], active:null, theme: 'dark-mode' };
+    const st = JSON.parse(raw);
+    return { 
+      baseline: {...defaultBaseline, ...(st.baseline||{})}, 
+      settings: {...defaultSettings, ...(st.settings||{})}, 
+      sessions: Array.isArray(st.sessions)? st.sessions : [], 
+      bodyweight: Array.isArray(st.bodyweight)? st.bodyweight : [], 
+      active: st.active || null,
+      theme: st.theme || 'dark-mode'
+    };
+  }catch(e){ return { baseline: {...defaultBaseline}, settings:{...defaultSettings}, sessions:[], bodyweight:[], active:null, theme: 'dark-mode' }; }
+}
+function saveState(st){ localStorage.setItem(STORAGE_KEY, JSON.stringify(st)); }
+let state = loadState();
+
+const $ = (sel)=>document.querySelector(sel);
+const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
+
+function applyTheme(theme) {
+  document.documentElement.className = theme;
+  state.theme = theme;
+  saveState(state);
+}
+$("#themeBtn").addEventListener("click", () => {
+  const newTheme = state.theme === 'dark-mode' ? 'light-mode' : 'dark-mode';
+  applyTheme(newTheme);
+});
+applyTheme(state.theme); 
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1500);
+}
+
+function setTab(name){
+  $$(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===name));
+  $$(".wk").forEach(w=>w.classList.toggle("active", w.id===name));
+  if(name === "progress") { renderProgress(); renderBodyweight(); }
+}
+
+function dayCard(day){
+  const el = document.createElement("div"); el.className = "day";
+  el.innerHTML = `
+    <div class="top">
+      <div class="name"><b>${day.title}</b><span>${day.subtitle}</span></div>
+      <div class="right"><button class="btn primary" data-start="${day.id}">Start Session</button></div>
+    </div>
+    <div class="list">
+      ${day.items.map(it=>`
+        <div class="ex">
+          ${it.img ? `<img src="${it.img}" class="ex-thumb" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"/> <div class="ex-thumb-empty" style="display:none;">IMG</div>` : `<div class="ex-thumb-empty">IMG</div>`}
+          <div class="nm"><div class="t">${it.name}</div><div class="d">${it.detail}</div></div>
+          <div class="sr">${it.sets} × ${it.reps}</div>
+          <button class="btn" data-log="${day.id}::${it.key}">Log</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  return el;
+}
+
+function renderSchedule(){
+  const wrap = $("#days"); wrap.innerHTML = "";
+  days.forEach(d=>wrap.appendChild(dayCard(d)));
+  wrap.querySelectorAll("[data-start]").forEach(b=>b.addEventListener("click", ()=>startSession(b.dataset.start)));
+  wrap.querySelectorAll("[data-log]").forEach(b=>b.addEventListener("click", ()=>openLogger(b.dataset.log)));
+}
+
+function renderBodyweight() {
+  const hist = state.bodyweight.slice(-5).reverse();
+  $("#bwHistory").innerHTML = !hist.length ? "<div>No records yet.</div>" : 
+    hist.map(b => `<div><span style="font-family:var(--mono); color:var(--text); font-weight:500;">${b.weight} lbs</span> <span style="color:var(--muted); margin-left:8px;">| ${new Date(b.date).toLocaleDateString()}</span></div>`).join("");
+}
+
+$("#logBwBtn").addEventListener("click", () => {
+  const val = $("#bwInput").value;
+  if(!val) return;
+  state.bodyweight.push({ date: new Date().toISOString(), weight: Number(val) });
+  saveState(state);
+  $("#bwInput").value = "";
+  renderBodyweight();
+  toast("Weight logged");
+});
+
+let sessionTimer = null;
+function startSession(dayId){
+  if(state.active){ toast("A session is active."); return; }
+  state.active = { id: "S_" + Math.random().toString(16).slice(2), dayId, start: new Date().toISOString(), sets: [] };
+  saveState(state); updateSidebar(); toast("Session Started");
+}
+
+function finishSession(){
+  if(!state.active) return;
+  state.sessions.push({...state.active, end: new Date().toISOString()});
+  state.active = null; saveState(state); resetSidebar(); toast("Saved");
+}
+
+function resetSidebar(){ /* Core timer/KPI resets */ }
+function updateSidebar(){ /* Core KPI updates */ }
+
+let modalCtx = null;
+function findExercise(dayId, exKey){ return days.find(x=>x.id===dayId)?.items.find(x=>x.key===exKey) || null; }
+
+function openLogger(token){
+  const [dayId, exKey] = token.split("::"); const ex = findExercise(dayId, exKey);
+  if(!ex) return;
+  modalCtx = { dayId, exKey, ex };
+  
+  $("#m_title").textContent = ex.name;
+  $("#m_sub").textContent = `${ex.sets} sets · Target: ${ex.reps}`;
+  
+  const hero = $("#m_hero");
+  if(ex.img) {
+      hero.src = ex.img;
+      hero.style.display = "block";
+  } else {
+      hero.style.display = "none";
+  }
+  
+  renderSetGrid(exKey, ex.sets, null);
+  showModal(true);
+}
+
+function renderSetGrid(exKey, setsCount, suggestedWeight){
+  const grid = $("#setGrid"); grid.innerHTML = "";
+  for(let i=1;i<=setsCount;i++){
+    grid.insertAdjacentHTML("beforeend", `
+      <div><div class="label">Set ${i} (lb)</div><input class="inp" id="w_${i}" type="number" inputmode="decimal"/></div>
+      <div><div class="label">Reps</div><input class="inp" id="r_${i}" type="number" inputmode="numeric"/></div>
+    `);
+  }
+}
+
+function showModal(on){
+  const o = $("#overlay");
+  if(on){ o.classList.add("show"); document.body.style.overflow = 'hidden'; } 
+  else { o.classList.remove("show"); document.body.style.overflow = ''; }
+}
+
+$("#m_close").addEventListener("click", ()=>showModal(false));
+$("#tabs").addEventListener("click", (e)=>{ const t = e.target.closest(".tab"); if(t) setTab(t.dataset.tab); });
+
+renderSchedule();
+renderBodyweight();
+</script>
+</body>
+</html>
