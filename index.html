@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark-mode">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
@@ -12,33 +12,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
     
     :root {
-      /* Dark Mode Base */
-      --bg: #000000;
-      --bg-gradient: radial-gradient(circle at 50% 0%, rgba(0, 158, 119, 0.05), transparent 60%), #050505;
-      --surface: rgba(255, 255, 255, 0.02);
-      --surface-glass: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.15);
-      --text: #ffffff;
-      --muted: #888888;
-      --muted2: #555555;
-      --modal-bg: rgba(15, 15, 15, 0.95);
-      
-      /* Shared Accents */
-      --accent: #009E77; /* Vibrant Teal */
-      --good: #009E77;
-      --bad: #ff453a;
-      --radius: 24px;
-      --radius-md: 16px;
-      --radius-sm: 10px;
-      --shadow: 0 40px 80px rgba(0,0,0,0.8);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      --blur: blur(24px);
-    }
-
-    /* Light Mode Overrides */
-    html.light-mode {
+      /* Light Mode Base (Default) */
       --bg: #f5f5f7;
       --bg-gradient: radial-gradient(circle at 50% 0%, rgba(0, 158, 119, 0.08), transparent 60%), #f5f5f7;
       --surface: rgba(0, 0, 0, 0.03);
@@ -50,6 +24,32 @@
       --muted2: #a1a1a6;
       --modal-bg: rgba(245, 245, 247, 0.95);
       --shadow: 0 30px 60px rgba(0,0,0,0.12);
+      
+      /* Shared Accents */
+      --accent: #009E77;
+      --good: #009E77;
+      --bad: #ff453a;
+      --radius: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --blur: blur(24px);
+    }
+
+    /* Dark Mode Overrides */
+    html.dark-mode {
+      --bg: #000000;
+      --bg-gradient: radial-gradient(circle at 50% 0%, rgba(0, 158, 119, 0.05), transparent 60%), #050505;
+      --surface: rgba(255, 255, 255, 0.02);
+      --surface-glass: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --text: #ffffff;
+      --muted: #888888;
+      --muted2: #555555;
+      --modal-bg: rgba(15, 15, 15, 0.95);
+      --shadow: 0 40px 80px rgba(0,0,0,0.8);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -87,9 +87,14 @@
       display: flex; align-items: center; justify-content: center;
     }
     .theme-toggle:hover { color: var(--text); background: var(--surface); }
-    .theme-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    html.light-mode .icon-sun { display: none; }
-    html.light-mode .icon-moon { display: block; }
+    /* Pointer-events none ensures the click registers on the button, not the SVG path */
+    .theme-toggle svg { pointer-events: none; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    
+    /* Default is Light, show Moon */
+    .icon-sun { display: none; }
+    .icon-moon { display: block; }
+    
+    /* Dark Mode, show Sun */
     html.dark-mode .icon-sun { display: block; }
     html.dark-mode .icon-moon { display: none; }
 
@@ -127,8 +132,8 @@
       user-select: none; transition: all 0.3s ease; touch-action: manipulation;
     }
     .tab:hover { color: var(--text); }
-    .tab.active { color: var(--bg); background: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    html.light-mode .tab.active { color: #fff; background: var(--text); }
+    .tab.active { color: #fff; background: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    html.dark-mode .tab.active { color: var(--bg); background: var(--text); }
     
     .body { padding: 24px; }
     @media (max-width: 768px) { .body { padding: 16px; } .card .hd { padding: 16px; } }
@@ -148,7 +153,7 @@
     
     .day .top {
       padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-      border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01);
+      border-bottom: 1px solid var(--border); background: rgba(124, 124, 124, 0.03);
     }
     .day .name { display: flex; flex-direction: column; gap: 6px; }
     .day .name b { font-size: 16px; color: var(--text); }
@@ -177,7 +182,6 @@
     .ex .nm .d { font-size: 12px; color: var(--muted); font-weight: 300; }
     .ex .sr { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
 
-    /* Updated Interactive Button Classes */
     .btn {
       border: 1px solid var(--border); 
       background: var(--surface); 
@@ -200,23 +204,13 @@
       transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease, border-color 0.2s ease;
     }
 
-    .btn:hover:not(:disabled) { 
-      background: var(--border); 
-      border-color: var(--border-hover); 
-    }
-
-    .btn:active:not(:disabled) { 
-      transform: scale(0.96); 
-    }
-
-    .btn:disabled { 
-      opacity: 0.4; 
-      cursor: not-allowed; 
-    }
+    .btn:hover:not(:disabled) { background: var(--border); border-color: var(--border-hover); }
+    .btn:active:not(:disabled) { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     
-    .btn.primary { background: var(--text); color: var(--bg); border: none; }
+    .btn.primary { background: var(--text); color: #fff; border: none; }
     .btn.primary:hover:not(:disabled) { opacity: 0.9; }
-    html.light-mode .btn.primary { background: var(--text); color: #fff; }
+    html.dark-mode .btn.primary { color: var(--bg); }
     .btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
     
     .inp {
@@ -240,13 +234,13 @@
     .small { font-size: 13px; line-height: 1.5; }
 
     .modalOverlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      position: fixed; inset: 0; background: rgba(255,255,255,0.4);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       display: none; align-items: flex-start; justify-content: center;
       padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
       z-index: 50; opacity: 0; transition: opacity 0.3s ease; overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
-    html.light-mode .modalOverlay { background: rgba(255,255,255,0.4); }
+    html.dark-mode .modalOverlay { background: rgba(0,0,0,0.6); }
     .modalOverlay.show { display: flex; opacity: 1; }
     
     .modal {
@@ -285,7 +279,7 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
-<body class="dark-mode">
+<body>
 <div class="wrap">
   <header>
     <div class="hleft">
@@ -299,7 +293,7 @@
       </div>
       <button class="theme-toggle" id="themeBtn" aria-label="Toggle light/dark mode">
         <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
     </div>
   </header>
@@ -429,18 +423,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = "training_plan_app_v4";
+// Key updated to v5 to ensure a clean cache flush for the new Light Mode default architecture
+const STORAGE_KEY = "training_plan_app_v5";
 const defaultBaseline = { pulldown:70, row:120, chest:140, highrow:80, shpress:60 };
 const defaultSettings = { restSec:75, plankSec:60 };
 
+/* Images are now mapped directly to the root, assuming they are sitting loose next to index.html */
 const days = [
   {
     id:"D1", title:"Day 1 — Frame A", subtitle:"Back + shoulders, plus a short leg block",
     pills:["Walk 10m"],
     items:[
-      {key:"pulldown", name:"Lat pulldown (neutral)", detail:"Elbows down. No shrug.", sets:3, reps:"8–12", img:"img/lat-pulldown.jpg"},
-      {key:"row", name:"Seated row", detail:"Pull to lower ribs. No rocking.", sets:3, reps:"8–12", img:"img/seated-row.jpg"},
-      {key:"sideraise", name:"Side raises", detail:"Width. Light + strict.", sets:4, reps:"12–20", img:"img/side-raise.jpg"},
+      {key:"pulldown", name:"Lat pulldown (neutral)", detail:"Elbows down. No shrug.", sets:3, reps:"8–12", img:"lat-pulldown.jpg"},
+      {key:"row", name:"Seated row", detail:"Pull to lower ribs. No rocking.", sets:3, reps:"8–12", img:"seated-row.jpg"},
+      {key:"sideraise", name:"Side raises", detail:"Width. Light + strict.", sets:4, reps:"12–20", img:"side-raise.jpg"},
       {key:"reardelt", name:"Rear delts", detail:"Posture + shoulder shape.", sets:3, reps:"12–15"}
     ]
   },
@@ -448,8 +444,8 @@ const days = [
     id:"D2", title:"Day 2 — Push", subtitle:"Upper chest + shoulders + triceps",
     pills:["Walk 10m"],
     items:[
-      {key:"chest", name:"Chest press machine", detail:"Stop if shoulder pinches.", sets:3, reps:"8–12", img:"img/chest-press.jpg"},
-      {key:"shpress", name:"Shoulder press", detail:"No shrug.", sets:3, reps:"8–12", img:"img/shoulder-press.jpg"},
+      {key:"chest", name:"Chest press machine", detail:"Stop if shoulder pinches.", sets:3, reps:"8–12", img:"chest-press.jpg"},
+      {key:"shpress", name:"Shoulder press", detail:"No shrug.", sets:3, reps:"8–12", img:"shoulder-press.jpg"},
       {key:"sideraise2", name:"Side raises", detail:"Light + controlled.", sets:3, reps:"12–20"},
       {key:"triceps", name:"Triceps pushdown", detail:"Elbows quiet.", sets:3, reps:"10–15"}
     ]
@@ -459,7 +455,7 @@ const days = [
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return { baseline: {...defaultBaseline}, settings:{...defaultSettings}, sessions:[], bodyweight:[], active:null, theme: 'dark-mode' };
+    if(!raw) return { baseline: {...defaultBaseline}, settings:{...defaultSettings}, sessions:[], bodyweight:[], active:null, theme: 'light-mode' };
     const st = JSON.parse(raw);
     return { 
       baseline: {...defaultBaseline, ...(st.baseline||{})}, 
@@ -467,9 +463,9 @@ function loadState(){
       sessions: Array.isArray(st.sessions)? st.sessions : [], 
       bodyweight: Array.isArray(st.bodyweight)? st.bodyweight : [], 
       active: st.active || null,
-      theme: st.theme || 'dark-mode'
+      theme: st.theme || 'light-mode'
     };
-  }catch(e){ return { baseline: {...defaultBaseline}, settings:{...defaultSettings}, sessions:[], bodyweight:[], active:null, theme: 'dark-mode' }; }
+  }catch(e){ return { baseline: {...defaultBaseline}, settings:{...defaultSettings}, sessions:[], bodyweight:[], active:null, theme: 'light-mode' }; }
 }
 function saveState(st){ localStorage.setItem(STORAGE_KEY, JSON.stringify(st)); }
 let state = loadState();
@@ -477,14 +473,23 @@ let state = loadState();
 const $ = (sel)=>document.querySelector(sel);
 const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
 
+/* Bulletproof Theme Toggle */
 function applyTheme(theme) {
-  document.documentElement.className = theme;
+  if (theme === 'dark-mode') {
+    document.documentElement.classList.add('dark-mode');
+    document.documentElement.classList.remove('light-mode');
+  } else {
+    document.documentElement.classList.add('light-mode');
+    document.documentElement.classList.remove('dark-mode');
+  }
   state.theme = theme;
   saveState(state);
 }
-$("#themeBtn").addEventListener("click", () => {
-  const newTheme = state.theme === 'dark-mode' ? 'light-mode' : 'dark-mode';
-  applyTheme(newTheme);
+
+$("#themeBtn").addEventListener("click", (e) => {
+  e.preventDefault();
+  const isDark = document.documentElement.classList.contains('dark-mode');
+  applyTheme(isDark ? 'light-mode' : 'dark-mode');
 });
 applyTheme(state.theme); 
 
