@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light-mode">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
@@ -25,7 +25,7 @@
       --modal-bg: rgba(245, 245, 247, 0.95);
       --shadow: 0 30px 60px rgba(0,0,0,0.12);
       
-      /* Shared Accents */
+      /* Shared Accents - Vibrant Teal */
       --accent: #009E77;
       --good: #009E77;
       --bad: #ff453a;
@@ -87,14 +87,11 @@
       display: flex; align-items: center; justify-content: center;
     }
     .theme-toggle:hover { color: var(--text); background: var(--surface); }
-    /* Pointer-events none ensures the click registers on the button, not the SVG path */
     .theme-toggle svg { pointer-events: none; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     
-    /* Default is Light, show Moon */
     .icon-sun { display: none; }
     .icon-moon { display: block; }
     
-    /* Dark Mode, show Sun */
     html.dark-mode .icon-sun { display: block; }
     html.dark-mode .icon-moon { display: none; }
 
@@ -279,7 +276,7 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
-<body>
+<body class="light-mode">
 <div class="wrap">
   <header>
     <div class="hleft">
@@ -372,7 +369,7 @@
         </div>
         <div class="body">
           <div class="kpiGrid">
-            <div class="kpi"><div class="k">Time</div><div class="v" id="sessionTime">—</div></div>
+            <div class="kpi"><div class="k">Time</div><div class="v" id="sessionTime">-</div></div>
             <div class="kpi"><div class="k">Logged sets</div><div class="v" id="setsCount">0</div></div>
             <div class="kpi" style="grid-column: 1 / -1;"><div class="k">Volume (est.)</div><div class="v" id="volume">0</div></div>
           </div>
@@ -423,31 +420,30 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// Key updated to v5 to ensure a clean cache flush for the new Light Mode default architecture
 const STORAGE_KEY = "training_plan_app_v5";
 const defaultBaseline = { pulldown:70, row:120, chest:140, highrow:80, shpress:60 };
 const defaultSettings = { restSec:75, plankSec:60 };
 
-/* Images are now mapped directly to the root, assuming they are sitting loose next to index.html */
+/* Images correctly mapped to the img/ folder and .png extensions */
 const days = [
   {
-    id:"D1", title:"Day 1 — Frame A", subtitle:"Back + shoulders, plus a short leg block",
+    id:"D1", title:"Day 1 - Frame A", subtitle:"Back + shoulders, plus a short leg block",
     pills:["Walk 10m"],
     items:[
-      {key:"pulldown", name:"Lat pulldown (neutral)", detail:"Elbows down. No shrug.", sets:3, reps:"8–12", img:"lat-pulldown.jpg"},
-      {key:"row", name:"Seated row", detail:"Pull to lower ribs. No rocking.", sets:3, reps:"8–12", img:"seated-row.jpg"},
-      {key:"sideraise", name:"Side raises", detail:"Width. Light + strict.", sets:4, reps:"12–20", img:"side-raise.jpg"},
-      {key:"reardelt", name:"Rear delts", detail:"Posture + shoulder shape.", sets:3, reps:"12–15"}
+      {key:"pulldown", name:"Lat pulldown (neutral)", detail:"Elbows down. No shrug.", sets:3, reps:"8-12", img:"img/lat-pulldown.png"},
+      {key:"row", name:"Seated row", detail:"Pull to lower ribs. No rocking.", sets:3, reps:"8-12", img:"img/seated-row.png"},
+      {key:"sideraise", name:"Side raises", detail:"Width. Light + strict.", sets:4, reps:"12-20", img:"img/side-raise.png"},
+      {key:"reardelt", name:"Rear delts", detail:"Posture + shoulder shape.", sets:3, reps:"12-15"}
     ]
   },
   {
-    id:"D2", title:"Day 2 — Push", subtitle:"Upper chest + shoulders + triceps",
+    id:"D2", title:"Day 2 - Push", subtitle:"Upper chest + shoulders + triceps",
     pills:["Walk 10m"],
     items:[
-      {key:"chest", name:"Chest press machine", detail:"Stop if shoulder pinches.", sets:3, reps:"8–12", img:"chest-press.jpg"},
-      {key:"shpress", name:"Shoulder press", detail:"No shrug.", sets:3, reps:"8–12", img:"shoulder-press.jpg"},
-      {key:"sideraise2", name:"Side raises", detail:"Light + controlled.", sets:3, reps:"12–20"},
-      {key:"triceps", name:"Triceps pushdown", detail:"Elbows quiet.", sets:3, reps:"10–15"}
+      {key:"chest", name:"Chest press machine", detail:"Stop if shoulder pinches.", sets:3, reps:"8-12", img:"img/chest-press.png"},
+      {key:"shpress", name:"Shoulder press", detail:"No shrug.", sets:3, reps:"8-12", img:"img/shoulder-press.png"},
+      {key:"sideraise2", name:"Side raises", detail:"Light + controlled.", sets:3, reps:"12-20"},
+      {key:"triceps", name:"Triceps pushdown", detail:"Elbows quiet.", sets:3, reps:"10-15"}
     ]
   }
 ];
@@ -473,7 +469,6 @@ let state = loadState();
 const $ = (sel)=>document.querySelector(sel);
 const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
 
-/* Bulletproof Theme Toggle */
 function applyTheme(theme) {
   if (theme === 'dark-mode') {
     document.documentElement.classList.add('dark-mode');
@@ -516,7 +511,7 @@ function dayCard(day){
         <div class="ex">
           ${it.img ? `<img src="${it.img}" class="ex-thumb" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"/> <div class="ex-thumb-empty" style="display:none;">IMG</div>` : `<div class="ex-thumb-empty">IMG</div>`}
           <div class="nm"><div class="t">${it.name}</div><div class="d">${it.detail}</div></div>
-          <div class="sr">${it.sets} × ${it.reps}</div>
+          <div class="sr">${it.sets} x ${it.reps}</div>
           <button class="btn" data-log="${day.id}::${it.key}">Log</button>
         </div>
       `).join("")}
@@ -573,7 +568,7 @@ function openLogger(token){
   modalCtx = { dayId, exKey, ex };
   
   $("#m_title").textContent = ex.name;
-  $("#m_sub").textContent = `${ex.sets} sets · Target: ${ex.reps}`;
+  $("#m_sub").textContent = `${ex.sets} sets | Target: ${ex.reps}`;
   
   const hero = $("#m_hero");
   if(ex.img) {
